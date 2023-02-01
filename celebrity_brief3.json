@@ -1,0 +1,19 @@
+{
+    "Celebrities": [{
+        "Timestamp": 60024,
+        "FrameNumber": 785,
+        "Celebrity": {
+            "Urls": [
+                "www.wikidata.org/wiki/Q19877955"
+            ],
+            "Name": "Jamil Douglas",
+            "Id": "uk3DS4a",
+            "KnownGender": {
+                "Type": "Male"
+            },
+            "Confidence": 77.95684051513672
+        }
+    }],
+    "Movie": "Cow_Rams",
+    "UUID": "62c9c5ba-9980-3479-32b3-2248678db956"
+}
