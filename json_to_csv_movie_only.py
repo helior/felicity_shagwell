@@ -2,7 +2,7 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 import json
 import csv
-from io import StringIO
+from io import StringIO, BytesIO
 
 # Connect to S3
 s3 = boto3.client("s3")
@@ -30,6 +30,10 @@ headers = ['~id', '~from', '~to', '~label']
 # Parse the JSON
 rows = []
 for element in data:
+    if not isinstance(element, dict):
+        print('Skipping malformed data, expected dictionary and got "{}"'.format(element))
+        continue
+
     if not element.get('UUID') or not element.get('Movie'):
         print('Warning: Missing "UUID" or "Movie" attributes.')
         continue
@@ -41,8 +45,15 @@ for element in data:
     rows.append(movie_row)
 
     if element.get('Celebrities'):
+        if not isinstance(element.get('Celebrities'), list):
+            print('Skipping malformed data, expected list and got "{}"'.format(element))
+            continue
+
         for celeb_entry in element.get('Celebrities'):
             celebrity = celeb_entry.get('Celebrity')
+            if not isinstance(celebrity, dict):
+                print('Skipping malformed data, expected dictionary and got "{}"'.format(element))
+                continue
             celebrity_row = {
                 '~id': '{}_celebrity_{}'.format(element.get('UUID'), celebrity.get('Id')),
                 '~from': element.get('UUID'),
@@ -56,11 +67,10 @@ pseudo_file = StringIO()
 writer = csv.DictWriter(pseudo_file, headers, delimiter="\t")
 writer.writeheader()
 writer.writerows(rows)
-contents = pseudo_file.getvalue()
 
 # Upload the file contents to S3
 try:
-    s3.upload_fileobj(contents, "so0050-0673f74da1e9-648353486619-us-west-2-proxy", output_file)
+    s3.upload_fileobj(pseudo_file, "so0050-0673f74da1e9-648353486619-us-west-2-proxy", output_file)
 except NoCredentialsError:
     print('No credentials to upload :P')
     exit()
