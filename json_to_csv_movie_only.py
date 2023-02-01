@@ -70,7 +70,7 @@ writer.writerows(rows)
 
 # Upload the file contents to S3
 try:
-    s3.upload_fileobj(pseudo_file, "so0050-0673f74da1e9-648353486619-us-west-2-proxy", output_file)
+    s3.upload_fileobj(BytesIO(pseudo_file.getvalue().encode()), "so0050-0673f74da1e9-648353486619-us-west-2-proxy", output_file)
 except NoCredentialsError:
     print('No credentials to upload :P')
     exit()
